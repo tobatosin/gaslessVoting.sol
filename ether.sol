@@ -1,36 +1,30 @@
-const { ethers } = require('ethers');
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.19;
 
-// Set up provider and signer
-const provider = new ethers.providers.JsonRpcProvider('YOUR_RPC_PROVIDER_URL');
-const privateKey = 'YOUR_PRIVATE_KEY';
-const signer = new ethers.Wallet(privateKey, provider);
 
-// Set up contract interface
-const daoAddress = 'YOUR_DAO_CONTRACT_ADDRESS';
-const daoABI = [
+
+
+contract MyContract {
+  // Set up contract interface
+  address public daoAddress;
   // Include your DAO contract's ABI here
-];
-const daoContract = new ethers.Contract(daoAddress, daoABI, signer);
+  // const daoABI = [...];
 
-// Gasless voting function
-async function gaslessVote(proposalId, vote) {
-  try {
-    // Generate a signature for the vote
-    const message = ethers.utils.solidityKeccak256(['uint256', 'bool'], [proposalId, vote]);
-    const signature = await signer.signMessage(ethers.utils.arrayify(message));
+  constructor(address _daoAddress) {
+    daoAddress = _daoAddress;
+  }
 
-    // Call the DAO contract's vote function
-    const tx = await daoContract.vote(proposalId, vote, signature);
-    await tx.wait();
-
-    console.log('Vote successful!');
-  } catch (error) {
-    console.error('Error while voting:', error);
+  // Gasless voting function
+  function gaslessVote(uint256 proposalId, bool vote, address signer, bytes memory signature) public {
+    try VoteInterface(daoAddress).vote(proposalId, vote, signer, signature) {
+      // Vote successful!
+   
+    } catch Error(string memory error) {
+  // Error while voting
+}
   }
 }
 
-// Example usage
-const proposalId = 1;
-const vote = true;
-
-gaslessVote(proposalId, vote);
+interface VoteInterface {
+  function vote(uint256 proposalId, bool vote, address signer, bytes memory signature) external returns (bool);
+}
